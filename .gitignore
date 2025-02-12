@@ -1,0 +1,29 @@
+# Python
+venv/
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Logs and databases
+*.log
+*.sqlite
+
+# Local development
+.DS_Store
+*.sublime-workspace
+
+# Build/compilation files
+build/
+dist/
+*.egg-info/
+
+# Streamlit
+.streamlit/
+data/
