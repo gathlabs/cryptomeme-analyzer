@@ -9,7 +9,7 @@ class MemeAnalyzer:
     def __init__(self):
         self.api_key = os.getenv('GEMINI_API_KEY')
         genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
+        self.model = genai.GenerativeModel('gemini-2.0-flash-lite')
 
     def analyze_meme(self, image_path: str):
         """
