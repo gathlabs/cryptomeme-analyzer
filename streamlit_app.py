@@ -6,6 +6,10 @@ import yfinance as yf
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 st.set_page_config(
     page_title="Crypto Meme Analyzer",
@@ -15,14 +19,14 @@ st.set_page_config(
 
 # Sidebar configuration
 with st.sidebar:
-    st.title("Pengaturan")
-    api_key = st.text_input("Masukkan Gemini API Key", type="password")
-    os.environ['GEMINI_API_KEY'] = api_key
+    st.title("Menu")
+    selected_page = st.radio(
+        "Pilih Halaman:",
+        ["Meme Analyzer", "Crypto Prices", "About"]
+    )
 
-# Main interface
-tab1, tab2, tab3 = st.tabs(["Meme Analyzer", "Crypto Prices", "About"])
-
-with tab1:
+# Main content
+if selected_page == "Meme Analyzer":
     st.title("🪙 Crypto Meme Based Market Predictor")
     st.markdown("""
     Analisis prediksi market berdasarkan meme yang muncul
@@ -38,8 +42,9 @@ with tab1:
         st.image(uploaded_file, caption="Meme yang Diunggah", use_container_width=True)
         
         if st.button("Analisis Sekarang 🚀", type="primary"):
+            api_key = os.getenv('GEMINI_API_KEY')
             if not api_key:
-                st.error("Harap masukkan API Key Gemini di sidebar!")
+                st.error("GEMINI_API_KEY tidak ditemukan di file .env!")
                 st.stop()
             
             with st.spinner("Analyzing..."):
@@ -91,7 +96,7 @@ with tab1:
                 finally:
                     os.unlink(image_path)
 
-with tab2:
+elif selected_page == "Crypto Prices":
     st.header("Crypto Price Charts")
     
     # Daftar kripto populer
@@ -187,6 +192,71 @@ with tab2:
     except Exception as e:
         st.error(f"Error saat mengambil data: {str(e)}")
 
-with tab3:
-    st.header("About")
-    st.write("Aplikasi ini menggunakan Streamlit dan yfinance untuk menganalisis meme cryptocurrency dan menampilkan chart harga kripto.")
+else:  # About page
+    st.header("🚀 About Crypto Meme Analyzer")
+    
+    # Deskripsi Utama
+    st.markdown("""
+    ### 🎯 Apa itu Crypto Meme Analyzer?
+    
+    Crypto Meme Analyzer adalah aplikasi inovatif yang menggabungkan kekuatan AI dengan analisis pasar cryptocurrency. 
+    Aplikasi ini memungkinkan Anda untuk:
+    - 🔍 Menganalisis meme crypto menggunakan Google Gemini AI
+    - 📊 Memantau harga real-time cryptocurrency populer
+    - 📈 Melihat tren harga historis 5 tahun terakhir
+    
+    ### 🛠️ Fitur Utama
+    
+    #### 1. Meme Analyzer
+    - Analisis visual dan teks dari meme cryptocurrency
+    - Prediksi sentimen market (Bullish/Bearish)
+    - Penjelasan detail tentang elemen visual dan konteks
+    - Tingkat kepercayaan prediksi
+    
+    #### 2. Crypto Price Tracker
+    - Data harga real-time dari Yahoo Finance
+    - Visualisasi harga 5 tahun terakhir
+    - Statistik harga (tertinggi, terendah, rata-rata)
+    - Tabel harga 7 hari terakhir
+    
+    ### 🔧 Teknologi yang Digunakan
+    
+    Aplikasi ini dibangun menggunakan teknologi modern:
+    - **Streamlit**: Framework Python untuk aplikasi web
+    - **Google Gemini AI**: Model AI untuk analisis meme
+    - **Yahoo Finance API**: Sumber data harga crypto
+    - **Seaborn & Matplotlib**: Visualisasi data
+    - **Pandas**: Analisis dan manipulasi data
+    
+    ### 📝 Cara Penggunaan
+    
+    1. **Analisis Meme**:
+       - Upload gambar meme cryptocurrency
+       - Klik "Analisis Sekarang"
+       - Dapatkan prediksi dan analisis detail
+    
+    2. **Track Harga**:
+       - Pilih cryptocurrency dari daftar
+       - Lihat harga terkini dan statistik
+       - Analisis tren harga melalui grafik
+    
+    ### ⚠️ Disclaimer
+    
+    Aplikasi ini dibuat untuk tujuan edukasi dan hiburan. Prediksi dan analisis yang diberikan tidak boleh dianggap sebagai 
+    saran finansial. Selalu lakukan riset mandiri sebelum membuat keputusan investasi.
+    
+    ### 👨‍💻 Developer
+    
+    Dikembangkan dengan ❤️ oleh Tim Gathlabs
+    """)
+    
+    # Tambahkan statistik aplikasi dalam 3 kolom
+    st.markdown("### 📊 Statistik Aplikasi")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric(label="Cryptocurrency", value="5+", help="Jumlah cryptocurrency yang dapat dianalisis")
+    with col2:
+        st.metric(label="Data Historis", value="5 Tahun", help="Rentang data historis yang tersedia")
+    with col3:
+        st.metric(label="Update Harga", value="Real-time", help="Frekuensi update data harga")

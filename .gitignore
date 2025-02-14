@@ -27,3 +27,7 @@ dist/
 # Streamlit
 .streamlit/
 data/
+
+# testing file
+tes.ipynb
+tes.py
