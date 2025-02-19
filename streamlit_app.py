@@ -21,7 +21,7 @@ st.set_page_config(
 with st.sidebar:
     st.title("Menu")
     selected_page = st.radio(
-        "Pilih Halaman:",
+        "Select Page:",
         ["Meme Analyzer", "Crypto Prices", "About"]
     )
 
@@ -29,23 +29,34 @@ with st.sidebar:
 if selected_page == "Meme Analyzer":
     st.title("🪙 Crypto Meme Based Market Predictor")
     st.markdown("""
-    Analisis prediksi market berdasarkan meme yang muncul
+    Market prediction analysis based on emerging memes
     """)
 
-    uploaded_file = st.file_uploader("Unggah meme cryptocurrency", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Upload cryptocurrency meme", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp_file:
             tmp_file.write(uploaded_file.getvalue())
             image_path = tmp_file.name
         
-        st.image(uploaded_file, caption="Meme yang Diunggah", use_container_width=True)
+        st.image(uploaded_file, caption="Uploaded Meme", use_container_width=True)
         
-        if st.button("Analisis Sekarang 🚀", type="primary"):
+        if st.button("Analyze Now 🚀", type="primary"):
+            # Debug for API key
             api_key = os.getenv('GEMINI_API_KEY')
+            st.write(f"Debug - API Key Status: {'Set' if api_key else 'Not Set'}")
+            
+            # Manual input option for API key if not found
             if not api_key:
-                st.error("GEMINI_API_KEY tidak ditemukan di file .env!")
-                st.stop()
+                st.warning("GEMINI_API_KEY not found in the .env file!")
+                manual_api_key = st.text_input("Enter Gemini API Key manually:", type="password")
+                
+                if manual_api_key:
+                    api_key = manual_api_key
+                    os.environ['GEMINI_API_KEY'] = api_key
+                else:
+                    st.error("Please enter the Gemini API Key!")
+                    st.stop()
             
             with st.spinner("Analyzing..."):
                 try:
@@ -55,24 +66,24 @@ if selected_page == "Meme Analyzer":
                     if "error" in result:
                         st.error(f"Error: {result['error']}")
                     else:
-                        # Tampilkan hasil analisis
-                        st.success("Analisis Selesai!")
+                        # Display analysis results
+                        st.success("Analysis Complete!")
                         
                         col1, col2 = st.columns(2)
                         
                         with col1:
-                            with st.expander("📊 Detail Analisis", expanded=True):
-                                st.subheader("Elemen Visual")
+                            with st.expander("📊 Analysis Details", expanded=True):
+                                st.subheader("Visual Elements")
                                 for element in result.get('analysis', {}).get('visual_elements', []):
                                     st.markdown(f"- {element}")
                                 
-                                st.subheader("Analisis Teks")
-                                st.write(f"Sentimen: **{result.get('analysis', {}).get('text_analysis', {}).get('sentiment', '')}**")
-                                st.write("Kata Kunci:")
+                                st.subheader("Text Analysis")
+                                st.write(f"Sentiment: **{result.get('analysis', {}).get('text_analysis', {}).get('sentiment', '')}**")
+                                st.write("Keywords:")
                                 st.write(result.get('analysis', {}).get('text_analysis', {}).get('keywords', []))
                         
                         with col2:
-                            with st.expander("🔮 Prediksi Market", expanded=True):
+                            with st.expander("🔮 Market Prediction", expanded=True):
                                 trend = result.get('prediction', {}).get('trend', '')
                                 confidence = result.get('prediction', {}).get('confidence', 0)
                                 
@@ -92,79 +103,79 @@ if selected_page == "Meme Analyzer":
                                     """, unsafe_allow_html=True)
                 
                 except Exception as e:
-                    st.error(f"Terjadi error: {str(e)}")
+                    st.error(f"An error occurred: {str(e)}")
                 finally:
                     os.unlink(image_path)
 
 elif selected_page == "Crypto Prices":
     st.header("Crypto Price Charts")
     
-    # Daftar kripto populer
-    crypto_list = ['BTC-USD', 'ETH-USD', 'BNB-USD', 'ADA-USD', 'DOGE-USD']
-    selected_crypto = st.selectbox("Pilih Cryptocurrency", crypto_list)
+    # List of popular cryptocurrencies
+    crypto_list = ['BTC-USD', 'ETH-USD', 'BNB-USD', 'NEAR-USD']
+    selected_crypto = st.selectbox("Select Cryptocurrency", crypto_list)
     
     try:
-        # Hitung tanggal 5 tahun yang lalu dari hari ini
+        # Calculate date 5 years ago from today
         end_date = pd.Timestamp.now()
         start_date = end_date - pd.DateOffset(years=5)
         
-        # Tampilkan loading state
-        with st.spinner(f'Mengambil data {selected_crypto}...'):
-            # Ambil data harga
+        # Show loading state
+        with st.spinner(f'Fetching data for {selected_crypto}...'):
+            # Fetch price data
             crypto_data = yf.download(selected_crypto, start=start_date, end=end_date, progress=False)
             
             if crypto_data.empty:
-                st.error(f"Tidak dapat mengambil data untuk {selected_crypto}")
+                st.error(f"Unable to fetch data for {selected_crypto}")
             else:
-                # 1. Tampilkan informasi harga terkini
+                # 1. Display current price information
                 latest_price = float(crypto_data['Close'].iloc[-1])
                 prev_price = float(crypto_data['Close'].iloc[-2])
                 price_change = ((latest_price - prev_price) / prev_price) * 100
                 
                 st.metric(
-                    label="Harga Terkini",
+                    label="Current Price",
                     value=f"${latest_price:,.2f}",
                     delta=f"{price_change:.2f}%"
                 )
                 
-                # 2. Tampilkan tabel harga 7 hari terakhir
-                st.subheader("Harga 7 Hari Terakhir")
+                # 2. Display 7-day price table
+                st.subheader("7-Day Price Table")
                 last_7_days = crypto_data.tail(7).copy()
                 
-                # Format tanggal dan data
+                # Format date and data
                 formatted_data = []
                 for idx, row in last_7_days.iterrows():
                     formatted_data.append({
-                        'Tanggal': idx.strftime('%Y-%m-%d'),
+                        'Date': idx.strftime('%Y-%m-%d'),
                         'Open': f"${float(row['Open']):,.2f}",
                         'High': f"${float(row['High']):,.2f}",
                         'Low': f"${float(row['Low']):,.2f}",
                         'Close': f"${float(row['Close']):,.2f}"
                     })
                 
-                # Buat DataFrame baru
+                # Create new DataFrame
                 formatted_df = pd.DataFrame(formatted_data)
-                formatted_df.set_index('Tanggal', inplace=True)
+                formatted_df.set_index('Date', inplace=True)
                 
-                # Tampilkan tabel
+                # Display table
                 st.dataframe(formatted_df, use_container_width=True)
                 
-                # 3. Tampilkan line chart 5 tahun terakhir menggunakan seaborn
-                st.subheader(f"Grafik Harga {selected_crypto} (5 Tahun Terakhir)")
+                # 3. Display 5-year line chart using seaborn
+                st.subheader(f"{selected_crypto} Price Chart (Last 5 Years)")
                 
-                # Set style seaborn
+                # Set seaborn style
                 sns.set_style("whitegrid")
                 plt.figure(figsize=(10, 6))
                 
                 # Plot data
                 sns.lineplot(data=crypto_data['Close'], color='#2196f3', linewidth=2)
                 
-                # Konfigurasi plot
-                plt.title(f'Harga {selected_crypto}', pad=20)
-                plt.xlabel('Tanggal')
-                plt.ylabel('Harga (USD)')
+                # Configure plot
+                plt.title(f'{selected_crypto} Price', pad=20)
+                plt.xlabel('Date')
+                plt.ylabel('Price (USD)')
                 
-                # Format y-axis ke format dollar
+                # Format y-axis to dollar format
                 current_values = plt.gca().get_yticks()
                 plt.gca().set_yticklabels(['${:,.0f}'.format(x) for x in current_values])
                 
@@ -174,89 +185,89 @@ elif selected_page == "Crypto Prices":
                 # Adjust layout
                 plt.tight_layout()
                 
-                # Tampilkan plot di Streamlit
+                # Display plot in Streamlit
                 st.pyplot(plt)
                 
-                # Tampilkan statistik tambahan
+                # Display additional statistics
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     highest_price = float(crypto_data['High'].max())
-                    st.metric("Harga Tertinggi", f"${highest_price:,.2f}")
+                    st.metric("Highest Price", f"${highest_price:,.2f}")
                 with col2:
                     lowest_price = float(crypto_data['Low'].min())
-                    st.metric("Harga Terendah", f"${lowest_price:,.2f}")
+                    st.metric("Lowest Price", f"${lowest_price:,.2f}")
                 with col3:
                     avg_price = float(crypto_data['Close'].mean())
-                    st.metric("Harga Rata-rata", f"${avg_price:,.2f}")
+                    st.metric("Average Price", f"${avg_price:,.2f}")
                 
     except Exception as e:
-        st.error(f"Error saat mengambil data: {str(e)}")
+        st.error(f"Error fetching data: {str(e)}")
 
 else:  # About page
     st.header("🚀 About Crypto Meme Analyzer")
     
-    # Deskripsi Utama
+    # Main Description
     st.markdown("""
-    ### 🎯 Apa itu Crypto Meme Analyzer?
+    ### 🎯 What is Crypto Meme Analyzer?
     
-    Crypto Meme Analyzer adalah aplikasi inovatif yang menggabungkan kekuatan AI dengan analisis pasar cryptocurrency. 
-    Aplikasi ini memungkinkan Anda untuk:
-    - 🔍 Menganalisis meme crypto menggunakan Google Gemini AI
-    - 📊 Memantau harga real-time cryptocurrency populer
-    - 📈 Melihat tren harga historis 5 tahun terakhir
+    Crypto Meme Analyzer is an innovative application that combines AI power with cryptocurrency market analysis. 
+    This application allows you to:
+    - 🔍 Analyze crypto memes using Google Gemini AI
+    - 📊 Monitor real-time prices of popular cryptocurrencies
+    - 📈 View historical price trends over the last 5 years
     
-    ### 🛠️ Fitur Utama
+    ### 🛠️ Key Features
     
     #### 1. Meme Analyzer
-    - Analisis visual dan teks dari meme cryptocurrency
-    - Prediksi sentimen market (Bullish/Bearish)
-    - Penjelasan detail tentang elemen visual dan konteks
-    - Tingkat kepercayaan prediksi
+    - Visual and text analysis of cryptocurrency memes
+    - Market sentiment prediction (Bullish/Bearish)
+    - Detailed explanation of visual elements and context
+    - Prediction confidence level
     
     #### 2. Crypto Price Tracker
-    - Data harga real-time dari Yahoo Finance
-    - Visualisasi harga 5 tahun terakhir
-    - Statistik harga (tertinggi, terendah, rata-rata)
-    - Tabel harga 7 hari terakhir
+    - Real-time price data from Yahoo Finance
+    - 5-year price visualization
+    - Price statistics (highest, lowest, average)
+    - 7-day price table
     
-    ### 🔧 Teknologi yang Digunakan
+    ### 🔧 Technologies Used
     
-    Aplikasi ini dibangun menggunakan teknologi modern:
-    - **Streamlit**: Framework Python untuk aplikasi web
-    - **Google Gemini AI**: Model AI untuk analisis meme
-    - **Yahoo Finance API**: Sumber data harga crypto
-    - **Seaborn & Matplotlib**: Visualisasi data
-    - **Pandas**: Analisis dan manipulasi data
+    This application is built using modern technologies:
+    - **Streamlit**: Python framework for web applications
+    - **Google Gemini AI**: AI model for meme analysis
+    - **Yahoo Finance API**: Source of crypto price data
+    - **Seaborn & Matplotlib**: Data visualization
+    - **Pandas**: Data analysis and manipulation
     
-    ### 📝 Cara Penggunaan
+    ### 📝 How to Use
     
-    1. **Analisis Meme**:
-       - Upload gambar meme cryptocurrency
-       - Klik "Analisis Sekarang"
-       - Dapatkan prediksi dan analisis detail
+    1. **Meme Analysis**:
+       - Upload a cryptocurrency meme image
+       - Click "Analyze Now"
+       - Get detailed predictions and analysis
     
-    2. **Track Harga**:
-       - Pilih cryptocurrency dari daftar
-       - Lihat harga terkini dan statistik
-       - Analisis tren harga melalui grafik
+    2. **Price Tracking**:
+       - Select a cryptocurrency from the list
+       - View current prices and statistics
+       - Analyze price trends through charts
     
     ### ⚠️ Disclaimer
     
-    Aplikasi ini dibuat untuk tujuan edukasi dan hiburan. Prediksi dan analisis yang diberikan tidak boleh dianggap sebagai 
-    saran finansial. Selalu lakukan riset mandiri sebelum membuat keputusan investasi.
+    This application is created for educational and entertainment purposes. The predictions and analysis provided should not be considered 
+    as financial advice. Always conduct your own research before making investment decisions.
     
     ### 👨‍💻 Developer
     
-    Dikembangkan dengan ❤️ oleh Tim Gathlabs
+    Developed with ❤️ by the Gathlabs Team
     """)
     
-    # Tambahkan statistik aplikasi dalam 3 kolom
-    st.markdown("### 📊 Statistik Aplikasi")
+    # Add application statistics in 3 columns
+    st.markdown("### 📊 Application Statistics")
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.metric(label="Cryptocurrency", value="5+", help="Jumlah cryptocurrency yang dapat dianalisis")
+        st.metric(label="Cryptocurrencies", value="5+", help="Number of cryptocurrencies that can be analyzed")
     with col2:
-        st.metric(label="Data Historis", value="5 Tahun", help="Rentang data historis yang tersedia")
+        st.metric(label="Historical Data", value="5 Years", help="Range of available historical data")
     with col3:
-        st.metric(label="Update Harga", value="Real-time", help="Frekuensi update data harga")
+        st.metric(label="Price Updates", value="Real-time", help="Frequency of price data updates")

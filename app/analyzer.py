@@ -13,20 +13,20 @@ class MemeAnalyzer:
 
     def analyze_meme(self, image_path: str):
         """
-        Menganalisis meme cryptocurrency dan memberikan prediksi market
+        Analyze cryptocurrency meme and provide market prediction
         Args:
-            image_path (str): Path ke gambar meme
+            image_path (str): Path to the meme image
         Returns:
-            dict: Hasil analisis dalam format JSON
+            dict: Analysis results in JSON format
         """
         try:
             img = Image.open(image_path)
-            prompt = """Analisis meme cryptocurrency ini dengan ketentuan:
-            1. Identifikasi elemen visual utama (simbol, karakter, grafik harga)
-            2. Analisis teks yang ada
-            3. Berikan kesimpulan apakah indikasi market akan bullish atau bearish
-            4. Berikan reasoning logis berdasarkan pola historis crypto
-            Format respons DALAM BAHASA INDONESIA dan gunakan format JSON TANPA MARKDOWN:
+            prompt = """Analyze this cryptocurrency meme with the following conditions:
+            1. Identify the main visual elements (symbols, characters, price charts)
+            2. Analyze the existing text
+            3. Provide a conclusion on whether the market indication is bullish or bearish
+            4. Provide logical reasoning based on historical crypto patterns
+            Format response IN ENGLISH and use JSON format WITHOUT MARKDOWN:
             {
                 "analysis": {
                     "visual_elements": [list of elements],
@@ -50,7 +50,7 @@ class MemeAnalyzer:
     def _parse_response(self, response_text: str):
         try:
             import json
-            # Bersihkan response dari karakter non-JSON
+            # Clean the response from non-JSON characters
             cleaned = response_text.strip()
             if '```json' in cleaned:
                 cleaned = cleaned.split('```json')[1].split('```')[0]
@@ -60,14 +60,14 @@ class MemeAnalyzer:
             # Parse JSON
             response_json = json.loads(cleaned)
             
-            # Validasi struktur response
+            # Validate the response structure
             if not all(key in response_json for key in ['analysis', 'prediction']):
-                raise ValueError("Struktur response tidak valid")
+                raise ValueError("Invalid response structure")
                 
             return response_json
         except Exception as e:
             return {
-                "error": f"Gagal memparse respons Gemini: {str(e)}",
+                "error": f"Failed to parse Gemini response: {str(e)}",
                 "raw_response": response_text
             }
 
