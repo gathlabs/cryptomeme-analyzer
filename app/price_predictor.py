@@ -3,6 +3,7 @@ import torch.nn as nn
 import yfinance as yf
 import numpy as np
 from datetime import datetime, timedelta
+import os
 
 class PricePredictor(nn.Module):
     def __init__(self, input_size=1, hidden_size=64, num_layers=2):
@@ -21,9 +22,30 @@ class PricePredictor(nn.Module):
         out = self.fc(out[:, -1, :])
         return out
 
+def get_model_path(model_filename='crypto_price_model.pth'):
+    """Get the correct path to the model file"""
+    # Try different possible locations
+    possible_paths = [
+        # Current directory
+        model_filename,
+        # Project root directory
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), model_filename),
+        # App directory
+        os.path.join(os.path.dirname(__file__), model_filename)
+    ]
+    
+    for path in possible_paths:
+        if os.path.exists(path):
+            return path
+    
+    raise FileNotFoundError(f"Model file {model_filename} not found in any of the expected locations")
+
 def load_model(model_path='crypto_price_model.pth'):
     """Load the trained model and scaler"""
     try:
+        # Get the correct model path
+        model_path = get_model_path(model_path)
+        
         checkpoint = torch.load(model_path)
         model = PricePredictor()
         model.load_state_dict(checkpoint['model_state_dict'])

@@ -41,7 +41,7 @@ class MemeAnalyzer:
                 print(f"Warning: Price prediction failed: {str(e)}")
                 price_context = ""
                 price_pred = None
-            
+
             prompt = f"""Analyze this cryptocurrency meme with the following conditions:
             1. Identify the main visual elements (symbols, characters, price charts)
             2. Analyze the existing text
