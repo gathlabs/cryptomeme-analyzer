@@ -177,7 +177,7 @@ def main():
         'seq_length': seq_length,
         'training_date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
-    torch.save(checkpoint, 'crypto_price_model.pth')
+    torch.save(checkpoint, 'crypto_price_model.pth', _use_new_zipfile_serialization=False)
     
     # Plot losses
     plt.figure(figsize=(10, 6))

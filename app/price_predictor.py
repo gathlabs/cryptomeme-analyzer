@@ -4,6 +4,11 @@ import yfinance as yf
 import numpy as np
 from datetime import datetime, timedelta
 import os
+import pickle
+from sklearn.preprocessing import MinMaxScaler
+
+# Add safe globals for model loading
+torch.serialization.add_safe_globals([('sklearn.preprocessing._data', 'MinMaxScaler')])
 
 class PricePredictor(nn.Module):
     def __init__(self, input_size=1, hidden_size=64, num_layers=2):
@@ -46,11 +51,21 @@ def load_model(model_path='crypto_price_model.pth'):
         # Get the correct model path
         model_path = get_model_path(model_path)
         
-        checkpoint = torch.load(model_path)
+        # Load model with weights_only=False temporarily
+        # TODO: Update model saving format to be compatible with weights_only=True
+        checkpoint = torch.load(model_path, weights_only=False)
+        
+        # Initialize and load model
         model = PricePredictor()
         model.load_state_dict(checkpoint['model_state_dict'])
-        scaler = checkpoint['scaler']
         model.eval()
+        
+        # Get scaler
+        scaler = checkpoint.get('scaler')
+        if scaler is None:
+            scaler = MinMaxScaler()
+            # We'll fit the scaler on first use
+        
         return model, scaler, checkpoint.get('seq_length', 30)
     except Exception as e:
         raise Exception(f"Failed to load model: {str(e)}")
@@ -84,6 +99,10 @@ def get_price_prediction(symbol='BTC-USD', days=1):
         crypto = yf.Ticker(symbol)
         hist = crypto.history(period=f'{seq_length+10}d')
         prices = hist['Close'].values[-seq_length:]
+        
+        # Fit scaler if needed
+        if not hasattr(scaler, 'n_samples_seen_') or scaler.n_samples_seen_ is None:
+            scaler.fit(prices.reshape(-1, 1))
         
         # Calculate volatility for confidence
         volatility = np.std(np.diff(prices) / prices[:-1])

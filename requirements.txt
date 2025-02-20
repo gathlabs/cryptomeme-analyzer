@@ -4,3 +4,4 @@ pillow
 streamlit
 yfinance
 plotly
+tqdm==4.66.1

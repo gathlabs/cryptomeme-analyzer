@@ -69,38 +69,121 @@ if selected_page == "Meme Analyzer":
                         # Display analysis results
                         st.success("Analysis Complete!")
                         
-                        col1, col2 = st.columns(2)
+                        # Market Prediction Section (Top)
+                        st.markdown("## 🔮 Market Prediction")
                         
-                        with col1:
-                            with st.expander("📊 Analysis Details", expanded=True):
-                                st.subheader("Visual Elements")
-                                for element in result.get('analysis', {}).get('visual_elements', []):
-                                    st.markdown(f"- {element}")
-                                
-                                st.subheader("Text Analysis")
-                                st.write(f"Sentiment: **{result.get('analysis', {}).get('text_analysis', {}).get('sentiment', '')}**")
-                                st.write("Keywords:")
-                                st.write(result.get('analysis', {}).get('text_analysis', {}).get('keywords', []))
+                        trend = result.get('prediction', {}).get('trend', '')
+                        confidence = result.get('prediction', {}).get('confidence', 0)
                         
-                        with col2:
-                            with st.expander("🔮 Market Prediction", expanded=True):
-                                trend = result.get('prediction', {}).get('trend', '')
-                                confidence = result.get('prediction', {}).get('confidence', 0)
+                        if trend.lower() == "bullish":
+                            st.markdown(f"""
+                            <div style='background-color: #4CAF50; padding: 20px; border-radius: 10px; color: white;'>
+                                <h2>📈 Bullish (Confidence: {confidence}%)</h2>
+                                <p>{result.get('prediction', {}).get('reasoning', '')}</p>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        else:
+                            st.markdown(f"""
+                            <div style='background-color: #f44336; padding: 20px; border-radius: 10px; color: white;'>
+                                <h2>📉 Bearish ({confidence}%)</h2>
+                                <p>{result.get('prediction', {}).get('reasoning', '')}</p>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                        # Detailed Analysis Section (Bottom, Collapsed by Default)
+                        with st.expander("📊 Detailed Analysis", expanded=False):
+                            # Price Analysis
+                            st.subheader("💰 Price Analysis")
+                            price_analysis = result.get('prediction', {}).get('price_analysis', {})
+                            model_pred = price_analysis.get('model_prediction', {})
+                            
+                            if model_pred:
+                                # Model Prediction Details
+                                st.markdown("""
+                                ##### Model Prediction Details
+                                """)
                                 
-                                if trend.lower() == "bullish":
-                                    st.markdown(f"""
-                                    <div style='background-color: #4CAF50; padding: 20px; border-radius: 10px; color: white;'>
-                                        <h2>📈 Bullish (Confidence: {confidence}%)</h2>
-                                        <p>{result.get('prediction', {}).get('reasoning', '')}</p>
-                                    </div>
-                                    """, unsafe_allow_html=True)
+                                details_df = pd.DataFrame({
+                                    'Metric': [
+                                        'Current Price',
+                                        'Predicted Price',
+                                        'Change Percentage',
+                                        'Trend',
+                                        'Model Confidence',
+                                        'Market Volatility',
+                                        'Prediction Date'
+                                    ],
+                                    'Value': [
+                                        f"${model_pred.get('current_price', 0):,.2f}",
+                                        f"${model_pred.get('predicted_price', 0):,.2f}",
+                                        f"{model_pred.get('percent_change', 0):+.2f}%",
+                                        model_pred.get('trend', 'N/A').title(),
+                                        f"{model_pred.get('confidence', 0):.1f}%",
+                                        f"{model_pred.get('volatility', 0):.4f}",
+                                        model_pred.get('prediction_date', 'N/A')
+                                    ]
+                                })
+                                st.dataframe(details_df, hide_index=True)
+                                
+                                # Alignment with Meme
+                                st.markdown("""
+                                ##### Analysis Alignment
+                                """)
+                                alignment = price_analysis.get('alignment_with_meme', 'N/A')
+                                if alignment.lower() == 'high':
+                                    alignment_color = '#4CAF50'
+                                elif alignment.lower() == 'medium':
+                                    alignment_color = '#FFA500'
                                 else:
-                                    st.markdown(f"""
-                                    <div style='background-color: #f44336; padding: 20px; border-radius: 10px; color: white;'>
-                                        <h2>📉 Bearish ({confidence}%)</h2>
-                                        <p>{result.get('prediction', {}).get('reasoning', '')}</p>
-                                    </div>
-                                    """, unsafe_allow_html=True)
+                                    alignment_color = '#f44336'
+                                
+                                st.markdown(f"""
+                                <div style='background-color: {alignment_color}; padding: 10px; border-radius: 5px; color: white;'>
+                                    Alignment with Meme Analysis: {alignment.title()}
+                                </div>
+                                """, unsafe_allow_html=True)
+                                
+                                # Combined Analysis
+                                st.markdown("""
+                                ##### Combined Analysis
+                                """)
+                                st.info(price_analysis.get('combined_analysis', 'No combined analysis available'))
+                            
+                            # Visual Elements
+                            st.markdown("""
+                            ---
+                            ### 🎨 Visual Elements
+                            """)
+                            for element in result.get('analysis', {}).get('visual_elements', []):
+                                st.markdown(f"- {element}")
+                            
+                            # Text Analysis
+                            st.markdown("""
+                            ---
+                            ### 📝 Text Analysis
+                            """)
+                            text_analysis = result.get('analysis', {}).get('text_analysis', {})
+                            
+                            # Sentiment with color coding
+                            sentiment = text_analysis.get('sentiment', '').lower()
+                            if sentiment == 'positive':
+                                sentiment_color = '#4CAF50'
+                            elif sentiment == 'negative':
+                                sentiment_color = '#f44336'
+                            else:
+                                sentiment_color = '#FFA500'
+                            
+                            st.markdown(f"""
+                            <div style='background-color: {sentiment_color}; padding: 10px; border-radius: 5px; color: white;'>
+                                Sentiment: {sentiment.title()}
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            # Keywords
+                            st.markdown("#### Keywords")
+                            keywords = text_analysis.get('keywords', [])
+                            if keywords:
+                                st.markdown(" • ".join(f"**{keyword}**" for keyword in keywords))
                 
                 except Exception as e:
                     st.error(f"An error occurred: {str(e)}")
