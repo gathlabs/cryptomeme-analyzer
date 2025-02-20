@@ -368,5 +368,4 @@ else:  # About page
     
     # Version Info
     st.sidebar.markdown("---")
-    st.sidebar.markdown("v1.1.0")
-    st.sidebar.markdown("Made with ❤️ by CryptoMeme Team")
+    st.sidebar.markdown("&#169; 2025 GathLabs Team")
