@@ -287,70 +287,86 @@ elif selected_page == "Crypto Prices":
         st.error(f"Error fetching data: {str(e)}")
 
 else:  # About page
-    st.header("🚀 About Crypto Meme Analyzer")
+    st.header("🚀 CryptoMeme Analyzer")
     
     # Main Description
     st.markdown("""
-    ### 🎯 What is Crypto Meme Analyzer?
-    
-    Crypto Meme Analyzer is an innovative application that combines AI power with cryptocurrency market analysis. 
-    This application allows you to:
-    - 🔍 Analyze crypto memes using Google Gemini AI
-    - 📊 Monitor real-time prices of popular cryptocurrencies
-    - 📈 View historical price trends over the last 5 years
-    
-    ### 🛠️ Key Features
-    
-    #### 1. Meme Analyzer
-    - Visual and text analysis of cryptocurrency memes
-    - Market sentiment prediction (Bullish/Bearish)
-    - Detailed explanation of visual elements and context
-    - Prediction confidence level
-    
-    #### 2. Crypto Price Tracker
-    - Real-time price data from Yahoo Finance
-    - 5-year price visualization
-    - Price statistics (highest, lowest, average)
-    - 7-day price table
-    
-    ### 🔧 Technologies Used
-    
-    This application is built using modern technologies:
-    - **Streamlit**: Python framework for web applications
-    - **Google Gemini AI**: AI model for meme analysis
-    - **Yahoo Finance API**: Source of crypto price data
-    - **Seaborn & Matplotlib**: Data visualization
-    - **Pandas**: Data analysis and manipulation
-    
-    ### 📝 How to Use
-    
-    1. **Meme Analysis**:
-       - Upload a cryptocurrency meme image
-       - Click "Analyze Now"
-       - Get detailed predictions and analysis
-    
-    2. **Price Tracking**:
-       - Select a cryptocurrency from the list
-       - View current prices and statistics
-       - Analyze price trends through charts
-    
-    ### ⚠️ Disclaimer
-    
-    This application is created for educational and entertainment purposes. The predictions and analysis provided should not be considered 
-    as financial advice. Always conduct your own research before making investment decisions.
-    
-    ### 👨‍💻 Developer
-    
-    Developed with ❤️ by the Gathlabs Team
+    ### 🎯 Overview
+    CryptoMeme Analyzer is an innovative platform that combines cryptocurrency meme analysis with AI-powered price prediction. 
+    The platform leverages a powerful combination of:
+    - 🤖 AI Models for visual and text meme analysis
+    - 📊 LSTM Models for cryptocurrency price prediction
+    - 📈 Market sentiment analysis and historical context
     """)
     
-    # Add application statistics in 3 columns
-    st.markdown("### 📊 Application Statistics")
-    col1, col2, col3 = st.columns(3)
+    # Features
+    st.markdown("""
+    ### ✨ Key Features
     
-    with col1:
-        st.metric(label="Cryptocurrencies", value="5+", help="Number of cryptocurrencies that can be analyzed")
-    with col2:
-        st.metric(label="Historical Data", value="5 Years", help="Range of available historical data")
-    with col3:
-        st.metric(label="Price Updates", value="Real-time", help="Frequency of price data updates")
+    #### 1. Comprehensive Meme Analysis
+    - **Visual Analysis**: Detection of visual elements, symbols, characters, and charts
+    - **Text Analysis**: In-depth analysis of text and context within memes
+    - **Sentiment Analysis**: Market sentiment determination (bullish/bearish)
+    
+    #### 2. AI Price Prediction
+    - **Real-time Price Data**: Up-to-the-minute cryptocurrency pricing
+    - **LSTM Predictions**: Deep learning-based price forecasting
+    - **Volatility Analysis**: Market volatility calculations for confidence metrics
+    
+    #### 3. Market Context
+    - **Historical Patterns**: Analysis of historical price patterns
+    - **Combined Analysis**: Integration of meme analysis with price predictions
+    - **Confidence Metrics**: Trust scores based on multiple factors
+    """)
+    
+    # How It Works
+    with st.expander("🔍 How It Works", expanded=False):
+        st.markdown("""
+        1. **Upload Meme**
+           - Upload your cryptocurrency meme for analysis
+           - Supported formats: JPG, JPEG, PNG
+        
+        2. **AI Analysis**
+           - AI models analyze visual elements and text
+           - Identify key symbols and context
+           - Determine base meme sentiment
+        
+        3. **Price Analysis**
+           - LSTM model analyzes historical price data
+           - Calculates price predictions and volatility
+           - Generates confidence metrics
+        
+        4. **Combined Prediction**
+           - Merges meme analysis and price predictions
+           - Produces final prediction with confidence score
+           - Provides market trend recommendations
+        """)
+    
+    # Technical Details
+    with st.expander("⚙️ Technical Details", expanded=False):
+        st.markdown("""
+        #### Models & Technology
+        - **Vision AI**: Google Cloud Vision AI for image analysis
+        - **NLP**: Gemini Pro for text and context analysis
+        - **Price Prediction**: Custom LSTM model built with PyTorch
+        - **Data Source**: Real-time data from Yahoo Finance
+        
+        #### Metrics & Calculations
+        - **Volatility**: Standard deviation of relative price changes
+        - **Confidence Score**: Combination of market volatility and prediction quality
+        - **Price Change**: Percentage change from current to predicted price
+        """)
+    
+    # Disclaimer
+    st.warning("""
+    **⚠️ Disclaimer**
+    
+    This application is intended for educational and entertainment purposes only. The analysis and predictions 
+    provided should NOT be used as the sole basis for investment decisions. Always conduct your own research 
+    and consult with professional financial advisors before making any investment decisions.
+    """)
+    
+    # Version Info
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("v1.1.0")
+    st.sidebar.markdown("Made with ❤️ by CryptoMeme Team")
