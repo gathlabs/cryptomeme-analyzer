@@ -7,9 +7,6 @@ import os
 import pickle
 from sklearn.preprocessing import MinMaxScaler
 
-# Add safe globals for model loading
-torch.serialization.add_safe_globals([('sklearn.preprocessing._data', 'MinMaxScaler')])
-
 class PricePredictor(nn.Module):
     def __init__(self, input_size=1, hidden_size=64, num_layers=2):
         super(PricePredictor, self).__init__()
