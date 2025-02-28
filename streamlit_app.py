@@ -39,7 +39,7 @@ if selected_page == "Meme Analyzer":
             tmp_file.write(uploaded_file.getvalue())
             image_path = tmp_file.name
         
-        st.image(uploaded_file, caption="Uploaded Meme", use_container_width=True)
+        st.image(uploaded_file, caption="Uploaded Meme")
         
         if st.button("Analyze Now 🚀", type="primary"):
             # Debug for API key
