@@ -12,8 +12,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 st.set_page_config(
-    page_title="Crypto Meme Analyzer",
-    page_icon="🚀",
+    page_title="Mizer",
+    page_icon="🫗",
     layout="centered"
 )
 
@@ -27,7 +27,7 @@ with st.sidebar:
 
 # Main content
 if selected_page == "Meme Analyzer":
-    st.title("🪙 Crypto Meme Based Market Predictor")
+    st.title("🫗 Mizer - Crypto Meme Based Market Predictor")
     st.markdown("""
     Market prediction analysis based on emerging memes
     """)
@@ -70,7 +70,7 @@ if selected_page == "Meme Analyzer":
                         st.success("Analysis Complete!")
                         
                         # Market Prediction Section (Top)
-                        st.markdown("## 🔮 Market Prediction")
+                        st.markdown("## Market Prediction")
                         
                         trend = result.get('prediction', {}).get('trend', '')
                         confidence = result.get('prediction', {}).get('confidence', 0)
@@ -91,9 +91,9 @@ if selected_page == "Meme Analyzer":
                             """, unsafe_allow_html=True)
                         
                         # Detailed Analysis Section (Bottom, Collapsed by Default)
-                        with st.expander("📊 Detailed Analysis", expanded=False):
+                        with st.expander("Detailed Analysis", expanded=False):
                             # Price Analysis
-                            st.subheader("💰 Price Analysis")
+                            st.subheader("Price Analysis")
                             price_analysis = result.get('prediction', {}).get('price_analysis', {})
                             model_pred = price_analysis.get('model_prediction', {})
                             
@@ -152,7 +152,7 @@ if selected_page == "Meme Analyzer":
                             # Visual Elements
                             st.markdown("""
                             ---
-                            ### 🎨 Visual Elements
+                            ### Visual Elements
                             """)
                             for element in result.get('analysis', {}).get('visual_elements', []):
                                 st.markdown(f"- {element}")
@@ -287,12 +287,12 @@ elif selected_page == "Crypto Prices":
         st.error(f"Error fetching data: {str(e)}")
 
 else:  # About page
-    st.header("🚀 CryptoMeme Analyzer")
+    st.header("🫗 Mizer")
     
     # Main Description
     st.markdown("""
     ### 🎯 Overview
-    CryptoMeme Analyzer is an innovative platform that combines cryptocurrency meme analysis with AI-powered price prediction. 
+    Mizer is an innovative platform that combines cryptocurrency meme analysis with AI-powered price prediction. 
     The platform leverages a powerful combination of:
     - 🤖 AI Models for visual and text meme analysis
     - 📊 LSTM Models for cryptocurrency price prediction
